@@ -1,7 +1,13 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 
-const Input = ({ className = "", name = "", control }) => {
+const Input = ({
+  type = "text",
+  className = "",
+  name = "",
+  control,
+  placeholder = "",
+}) => {
   return (
     <Controller
       name={name}
@@ -9,8 +15,13 @@ const Input = ({ className = "", name = "", control }) => {
       defaultValue={name === "reusedDM" || name === "reusedCM" ? "0" : ""}
       render={({ field }) => (
         <input
-          type="text"
-          className={`outline-none border border-gray-300 rounded-md py-1 px-2 ${className}`}
+          type={type}
+          className={`outline-none border border-gray-300 rounded-md py-1 px-2 ${
+            name === "reusedDM" || name === "reusedCM"
+              ? "select-none opacity-50 cursor-not-allowed"
+              : ""
+          } ${className}`}
+          placeholder={placeholder}
           {...field}
         />
       )}

@@ -2,10 +2,11 @@ import React from "react";
 import { Controller } from "react-hook-form";
 import Label from "./Label";
 import Select from "./Select";
+import Wrapper from "./Wrapper";
 
 const Factorial = ({ factorial = [], title = "", control }) => {
   return (
-    <div className="p-3 border rounded-md shadow-sm bg-white">
+    <Wrapper>
       <Label label={title} isTitle />
       <div className="flex flex-col gap-1">
         {factorial.map((item, index) => (
@@ -32,7 +33,7 @@ const Factorial = ({ factorial = [], title = "", control }) => {
           </div>
         ))}
       </div>
-    </div>
+    </Wrapper>
   );
 };
 

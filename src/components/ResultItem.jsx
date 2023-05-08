@@ -1,5 +1,6 @@
 import React from "react";
 import Label from "./Label";
+import { getDecimal } from "../utils/fn";
 
 const ResultItem = ({ label = "", result = 0, unit }) => {
   return (
@@ -7,7 +8,7 @@ const ResultItem = ({ label = "", result = 0, unit }) => {
       <Label label={label} className="font-bold" />
       <span> = </span>
       <div className="flex items-center gap-3">
-        <p>{result}</p>
+        <p className="textlg font-bold">{getDecimal(Number(result))}</p>
         <span className="text-sm font-semibold text-gray-500">{unit}</span>
       </div>
     </div>

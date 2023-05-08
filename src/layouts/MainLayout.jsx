@@ -4,11 +4,11 @@ import Sidebar from "../components/Sidebar";
 
 const MainLayout = () => {
   return (
-    <div className="grid grid-cols-10 min-h-screen">
-      <div className="col-span-2 h-full">
+    <div className="w-full">
+      <div className="w-[18%] h-full min-h-screen max-h-screen fixed top-0 left-0">
         <Sidebar />
       </div>
-      <div className="col-span-8">
+      <div className="w-[82%] ml-[18%]">
         <Outlet />
       </div>
     </div>

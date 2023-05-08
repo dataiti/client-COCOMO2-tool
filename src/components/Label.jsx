@@ -5,14 +5,14 @@ const Label = ({ className = "", htmlFor, label = "", isTitle = false }) => {
     <>
       {isTitle ? (
         <label
-          className={`font-bold text-base text-black ${className}`}
+          className={`font-bold text-lg text-black ${className}`}
           htmlFor={htmlFor}
         >
           {label}
         </label>
       ) : (
         <label
-          className={`font-semibold text-sm text-emerald-700 text-center ${className}`}
+          className={`font-semibold text-base text-emerald-700 ${className}`}
           htmlFor={htmlFor}
         >
           {label}
