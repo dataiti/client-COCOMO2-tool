@@ -1,11 +1,26 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { calculateFunctionPointsAPI } from "../../apis/calculate";
+import {
+  calculateFunctionPointsAPI,
+  calculateSourceLinesOfCodeAPI,
+} from "../../apis/calculate";
 
 const calculateFunctionPointsThunkAction = createAsyncThunk(
   "calculate/calculateFunctionPoints",
-  async ({ data }, thunkAPI) => {
+  async ({ userId, data }, thunkAPI) => {
     try {
-      const res = await calculateFunctionPointsAPI({ data });
+      const res = await calculateFunctionPointsAPI({ userId, data });
+      return res;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+const calculateSourceLinesOfCodeThunkAction = createAsyncThunk(
+  "calculate/calculateSourceLinesOfCode",
+  async ({ userId, data }, thunkAPI) => {
+    try {
+      const res = await calculateSourceLinesOfCodeAPI({ userId, data });
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -26,16 +41,26 @@ const calculateSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(
-      calculateFunctionPointsThunkAction.fulfilled,
-      (state, action) => {
-        state.result = action.payload.data;
-      }
-    );
+    builder
+      .addCase(
+        calculateFunctionPointsThunkAction.fulfilled,
+        (state, action) => {
+          state.result = action.payload.data;
+        }
+      )
+      .addCase(
+        calculateSourceLinesOfCodeThunkAction.fulfilled,
+        (state, action) => {
+          state.result = action.payload.data;
+        }
+      );
   },
 });
 
-export { calculateFunctionPointsThunkAction };
+export {
+  calculateFunctionPointsThunkAction,
+  calculateSourceLinesOfCodeThunkAction,
+};
 export const calculateSelect = (state) => state.calculate;
 export const { clearResult } = calculateSlice.actions;
 export default calculateSlice.reducer;

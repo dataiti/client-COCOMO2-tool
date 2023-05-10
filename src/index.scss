@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    /* config css toastify */
+    --toastify-color-success: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+    --toastify-color-warning: linear-gradient(15deg, #cff10f 0%, #f3cc0a 100%);
+    --toastify-color-error: linear-gradient(15deg, #f43b47 0%, #453a94 100%);
+    --toastify-icon-color-success: #035450;
+    --toastify-icon-color-warning: #cff10f;
+    --toastify-icon-color-error: #d0011b;
+}
+
 * {
     padding: 0;
     margin: 0;

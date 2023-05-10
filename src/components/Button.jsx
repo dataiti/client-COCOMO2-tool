@@ -40,7 +40,7 @@ const Button = ({
 
   return (
     <Button
-      className={`rounded-md min-h-[40px] flex items-center justify-center
+      className={`rounded-md font-bold min-h-[40px] flex items-center justify-center
         ${primary && `${primaryStyle}`} 
         ${outline && `${outlineStyle}`} ${className}`}
       {...rest}

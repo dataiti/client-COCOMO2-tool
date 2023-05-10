@@ -4,12 +4,12 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 import { authSelect } from "../redux/features/authSlice";
 import Button from "../components/Button";
 import Loading from "../components/Loading";
 import SocialForm from "../components/SocialForm";
-import { toast } from "react-toastify";
 import Input from "../components/Input";
 import Label from "../components/Label";
 import { loginThunkAction } from "../redux/features/authSlice";
@@ -35,7 +35,7 @@ const LoginPage = () => {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting, isValid },
+    formState: { isSubmitting, isValid },
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -45,7 +45,7 @@ const LoginPage = () => {
     resolver: yupResolver(registerSchema),
   });
 
-  const handleSubmitSignUp = async (values) => {
+  const handleSubmitSignIn = async (values) => {
     if (!isValid) {
       return;
     }
@@ -53,10 +53,10 @@ const LoginPage = () => {
       setIsisLoading(true);
       const res = await dispatch(loginThunkAction(values));
       if (res && res.payload && res.payload.success) {
-        toast.success("Đăng nhập thành công !");
+        toast.success("Login successfully !");
         setResultMessage("");
       } else {
-        setResultMessage("Email hoặc mật khẩu chưa chính xác !");
+        setResultMessage("Email or password is incorrect !");
       }
       setIsisLoading(false);
     } catch (error) {
@@ -70,19 +70,19 @@ const LoginPage = () => {
 
   return (
     <form
-      onSubmit={handleSubmit(handleSubmitSignUp)}
-      className="w-[340px] px-8 pt-8 pb-14 rounded-3xl shadow-md bg-opacity border-2 border-white"
+      onSubmit={handleSubmit(handleSubmitSignIn)}
+      className="w-[340px] px-8 pt-8 pb-14 rounded-3xl shadow-md bg-white"
     >
       <h3 className="text-center pb-3 text-3xl font-bold">Login</h3>
       {(isSubmitting || isLoading) && <Loading />}
       <div className="flex flex-col gap-5">
         <div className="flex flex-col">
-          <Label label="Username" />
+          <Label label="Email" />
           <Input
             control={control}
             name="email"
             type="email"
-            placeholder="Enter your username"
+            placeholder="Enter your email"
             className="rounded-full py-3 px-4"
             //   errors={errors.email}
           />
@@ -92,7 +92,6 @@ const LoginPage = () => {
           <Input
             control={control}
             name="password"
-            label="Mật khẩu"
             type="password"
             placeholder="Enter your password"
             className="rounded-full py-3 px-4"

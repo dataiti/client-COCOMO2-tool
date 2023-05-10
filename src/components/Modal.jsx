@@ -13,7 +13,8 @@ function Modal({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const openModal = () => {
+  const openModal = (e) => {
+    e.preventDefault();
     setIsOpen(true);
   };
 

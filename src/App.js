@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
+import DetailConstruction from "./pages/DetailConstruction";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
 
       <Route element={<MainLayout />}>
         <Route path="/calculate" element={<CalculatePage />} />
+        <Route path="/construction/:id" element={<DetailConstruction />} />
       </Route>
 
       <Route path="/login" element={<LoginPage />} />

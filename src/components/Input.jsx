@@ -20,7 +20,7 @@ const Input = ({
             name === "reusedDM" || name === "reusedCM"
               ? "select-none opacity-50 cursor-not-allowed"
               : ""
-          } ${className}`}
+          }  placeholder:text-sm ${className}`}
           placeholder={placeholder}
           {...field}
         />

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 import {
   personnel,
   softwareCostDriversProduct,
@@ -10,33 +13,41 @@ import {
   softwareSize,
   languageFactor,
 } from "../utils/constant";
-import Factorial from "../components/Factorial";
-import Label from "../components/Label";
-import Select from "../components/Select";
-import Button from "../components/Button";
-import Input from "../components/Input";
-import ResultItem from "../components/ResultItem";
+import { authSelect } from "../redux/features/authSlice";
 import {
   calculateFunctionPointsThunkAction,
+  calculateSourceLinesOfCodeThunkAction,
   calculateSelect,
   clearResult,
 } from "../redux/features/caculateSlice";
-import Loading from "../components/Loading";
-import Wrapper from "../components/Wrapper";
+import {
+  Factorial,
+  Label,
+  Button,
+  Input,
+  ResultItem,
+  Loading,
+  Wrapper,
+  Select,
+  Modal,
+} from "../components";
+import LoginPage from "./LoginPage";
+
+const projectNameSchema = yup.object({
+  projectName: yup.string().required("Required !"),
+});
 
 const CalculatePage = () => {
   const [sizingMethod, setSizingMethod] = useState("SLOC");
   const [isLoading, setIsLoading] = useState(false);
 
+  const { isLoggedIn } = useSelector(authSelect);
+
   const dispatch = useDispatch();
   const { result } = useSelector(calculateSelect);
+  const { userInfo } = useSelector(authSelect);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm({
+  const { control, reset, getValues } = useForm({
     defaultValues: {
       projectName: "",
       language: "basic",
@@ -70,6 +81,8 @@ const CalculatePage = () => {
       softwareMaintenance: "Off",
       softwareLaborCostPerPM: "",
     },
+    mode: "onChange",
+    resolver: yupResolver(projectNameSchema),
   });
 
   const handleChangeTypeSizingMethod = (e) => {
@@ -78,13 +91,32 @@ const CalculatePage = () => {
     reset();
   };
 
-  const handleSubmitCalculatorCocomo = async (values) => {
+  const handleCalculateCocomo = async (e) => {
     try {
-      let formatData = { ...values, sizeType: sizingMethod };
+      e.preventDefault();
+      if (!getValues().projectName) {
+        return;
+      }
       setIsLoading(true);
-      if (sizingMethod === "FP") {
+
+      let formatData = {
+        ...getValues(),
+        sizeType: sizingMethod,
+        typeSubmit: "calculate",
+      };
+      if (sizingMethod === "SLOC") {
         await dispatch(
-          calculateFunctionPointsThunkAction({ data: formatData })
+          calculateSourceLinesOfCodeThunkAction({
+            userId: userInfo?._id,
+            data: formatData,
+          })
+        );
+      } else if (sizingMethod === "FP") {
+        await dispatch(
+          calculateFunctionPointsThunkAction({
+            userId: userInfo?._id,
+            data: formatData,
+          })
         );
       }
       setIsLoading(false);
@@ -93,7 +125,47 @@ const CalculatePage = () => {
     }
   };
 
-  console.log(result);
+  const handleSaveResult = async (e) => {
+    try {
+      e.preventDefault();
+      if (!getValues().projectName) {
+        return;
+      }
+      setIsLoading(true);
+
+      let formatData = {
+        ...getValues(),
+        sizeType: sizingMethod,
+        typeSubmit: "save",
+      };
+      if (sizingMethod === "SLOC") {
+        await dispatch(
+          calculateSourceLinesOfCodeThunkAction({
+            userId: userInfo?._id,
+            data: formatData,
+          })
+        );
+        dispatch(clearResult());
+        reset();
+      } else if (sizingMethod === "FP") {
+        await dispatch(
+          calculateFunctionPointsThunkAction({
+            userId: userInfo?._id,
+            data: formatData,
+          })
+        );
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetConstruction = (e) => {
+    e.preventDefault();
+    dispatch(clearResult());
+    reset();
+  };
 
   return (
     <div className="flex flex-col gap-3 px-10 py-2 bg-slate-200/80">
@@ -103,12 +175,9 @@ const CalculatePage = () => {
           COCOMO II - Constructive Cost Model
         </h3>
       </div>
-      <form
-        onSubmit={handleSubmit(handleSubmitCalculatorCocomo)}
-        className="flex flex-col gap-2"
-      >
+      <form className="flex flex-col gap-2">
         <div className="grid grid-cols-6 gap-2">
-          <div className="col-span-2">
+          <div className="col-span-2 flex flex-col gap-4">
             <div className="grid grid-cols-4 gap-6">
               <div className="col-span-3 flex flex-col gap-2">
                 <Label label="Project Name" isTitle />
@@ -117,39 +186,44 @@ const CalculatePage = () => {
             </div>
             {sizingMethod === "SLOC" && (
               <div className="flex flex-col gap-2">
-                <Label label="Type Model" isTitle />
-                <div className="flex flex-col gap-2">
-                  <div className="col-span-3 flex items-center gap-1">
+                <Label label="Type Mode" isTitle />
+                <div className="flex flex-col gap-3">
+                  <div className="col-span-3 flex items-center gap-3">
                     <Input type="radio" name="typeModel" control={control} />
-                    <Label label="Application Composition (Basic Mode)" />
+                    <Label label="Basic Mode" />
                   </div>
-                  <div className="col-span-3 flex items-center gap-1">
+                  <div className="col-span-3 flex items-center gap-3">
                     <Input type="radio" name="typeModel" control={control} />
-                    <Label label="Early Design model (Intermediate Mode)" />
+                    <Label label="Intermediate Mode" />
                   </div>
-                  <div className="col-span-3 flex items-center gap-1">
+                  <div className="col-span-3 flex items-center gap-3">
                     <Input type="radio" name="typeModel" control={control} />
-                    <Label label="Post- Architecture model (Advanced Mode)" />
+                    <Label label="Advanced Mode" />
                   </div>
                 </div>
               </div>
             )}
           </div>
           <div className="col-span-4 flex flex-col gap-2">
-            <div className="flex items-center gap-16">
-              <Label label="Software Size" isTitle />
-              {softwareSize.map((item, index) => (
-                <div className="flex items-center gap-2" key={index}>
-                  <Label label={item.title} />
-                  <Select onChange={handleChangeTypeSizingMethod}>
-                    {item.value.map((itemValue, index) => (
-                      <option value={itemValue.value} key={index}>
-                        {itemValue.key}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-              ))}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-7">
+                <Label label="Software Size" isTitle />
+                {softwareSize.map((item, index) => (
+                  <div className="flex items-center gap-2" key={index}>
+                    <Label label={item.title} />
+                    <Select onChange={handleChangeTypeSizingMethod}>
+                      {item.value.map((itemValue, index) => (
+                        <option value={itemValue.value} key={index}>
+                          {itemValue.key}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                ))}
+              </div>
+              <Button primary className="px-8 bg-green-600 hover:bg-green-500">
+                Import .CSV
+              </Button>
             </div>
             {sizingMethod === "SLOC" ? (
               <>
@@ -251,17 +325,36 @@ const CalculatePage = () => {
             <Button
               primary
               className="px-8 bg-emerald-900 hover:bg-emerald-800"
+              onClick={handleCalculateCocomo}
             >
               Calculate
             </Button>
-            <Button primary className="px-8 bg-yellow-900 hover:bg-yellow-800">
-              Save
+            {isLoggedIn ? (
+              <Button
+                primary
+                className="px-8 bg-yellow-900 hover:bg-yellow-800"
+                onClick={handleSaveResult}
+              >
+                Save
+              </Button>
+            ) : (
+              <Modal
+                nameBtn="Save"
+                primary={true}
+                classNameBtn="px-8 bg-yellow-900 hover:bg-yellow-800"
+              >
+                <LoginPage />
+              </Modal>
+            )}
+            <Button
+              primary
+              className="px-8 bg-cyan-900 hover:bg-cyan-800"
+              onClick={handleResetConstruction}
+            >
+              Reset
             </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button primary className="px-8 bg-green-600 hover:bg-green-500">
-              Import .CSV
-            </Button>
             <Button primary className="px-8 bg-rose-900 hover:bg-rose-800">
               Export .CSV
             </Button>

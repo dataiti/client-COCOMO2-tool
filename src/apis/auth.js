@@ -14,8 +14,8 @@ const loginAPI = async (data) => {
   }
 };
 
-const logoutAPI = async () => {
-  const res = await axiosClient.post("/auth/logout");
+const logoutAPI = async (data) => {
+  const res = await axiosClient.post("/auth/logout", data);
   if (res) {
     return res;
   }

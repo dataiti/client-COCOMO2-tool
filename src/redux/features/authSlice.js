@@ -44,9 +44,9 @@ const socialLoginThunkAction = createAsyncThunk(
 
 const logoutThunkAction = createAsyncThunk(
   "auth/logout",
-  async (_, thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
-      const res = await logoutAPI();
+      const res = await logoutAPI(data);
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
