@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
+import { Link, NavLink } from "react-router-dom";
+import { AiOutlinePlusCircle } from "react-icons/ai";
+import Swal from "sweetalert2";
 
+import logo from "../assets/cocomologo.jpg";
 import Button from "./Button";
-import { IoIosConstruct, IoTrash } from "../utils/icon";
+import { IoIosConstruct, IoMenu, IoTrash } from "../utils/icon";
 import { authSelect, logoutThunkAction } from "../redux/features/authSlice";
 import LoginPage from "../pages/LoginPage";
 import Modal from "./Modal";
@@ -12,10 +16,9 @@ import Loading from "./Loading";
 import {
   clearListHistoryConstructions,
   constructionSelect,
+  deleteConstructionThunkAction,
   getListConstructionProjectThunkAction,
 } from "../redux/features/constructionSlice";
-import { NavLink } from "react-router-dom";
-import { AiOutlinePlusCircle } from "react-icons/ai";
 
 const Sidebar = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -62,32 +65,66 @@ const Sidebar = () => {
       });
   };
 
+  const handleDeleteConstruction = async ({ constructionId }) => {
+    try {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#0B5345 ",
+        cancelButtonColor: "#A93226",
+        confirmButtonText: "Agree, delete it!",
+      }).then(async (result) => {
+        setIsLoading(true);
+        if (result.isConfirmed) {
+          await dispatch(
+            deleteConstructionThunkAction({
+              userId: userInfo?._id,
+              constructionId,
+            })
+          );
+          Swal.fire(
+            "Deleted!",
+            "Deleted construction in construction history list.",
+            "Successfully!"
+          );
+        }
+        setIsLoading(false);
+      });
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="bg-bg-sidebar h-full w-full">
       {isLoading && <Loading />}
-      {isLoggedIn && (
-        <div className="h-[20%] w-full flex flex-col gap-1 items-center justify-center px-4">
-          {userInfo && (
-            <>
-              <img
-                src={userInfo?.avatar}
-                alt=""
-                className="w-24 h-24 object-cover rounded-full border-2 border-white"
-              />
-              <p className="text-sm font-bold text-white">
-                {userInfo?.displayName || userInfo?.email}
-              </p>
-            </>
-          )}
+      <div className="h-[10%] px-4 flex items-center justify-between">
+        <div className="flex items-center gap-5">
+          <Link to="/">
+            <img
+              src={logo}
+              alt=""
+              className="w-14 h-14 object-cover rounded-lg"
+            />
+          </Link>
+          <p className="uppercase text-white font-extrabold text-2xl">
+            COCOMO II
+          </p>
         </div>
-      )}
+        <span className="text-white">
+          <IoMenu size={25} />
+        </span>
+      </div>
       {isLoggedIn && (
         <div className="h-[4%] bg-[#40414f] flex items-center justify-center text-sm text-white border-b border-t border-gray-500">
           Construction history
         </div>
       )}
       {isLoggedIn ? (
-        <div className="h-[68%]  overflow-y-auto">
+        <div className="h-[76%]  overflow-y-auto">
           <div className="px-4 py-2">
             <Button
               outline
@@ -104,7 +141,7 @@ const Sidebar = () => {
                 <NavLink
                   key={construction?._id}
                   className={({ isActive }) =>
-                    `flex items-center justify-between text-gray-400 px-6 py-4 font-semibold cursor-pointer hover:text-gray-300 hover:bg-[#5d5e71] hover:opacity-60 transition-all group ${
+                    `flex items-center justify-between text-gray-400 px-6 py-4 font-semibold cursor-pointer hover:text-gray-300 hover:bg-[#5d5e71] transition-all group ${
                       isActive
                         ? "bg-[#40414f] text-white border-l-[6px] border-yellow-500"
                         : ""
@@ -122,25 +159,49 @@ const Sidebar = () => {
                       {construction?.projectName.length > 14 && "..."}
                     </p>
                   </div>
-                  <span className="hidden group-hover:block">
-                    <IoTrash />
+                  <span
+                    className="hidden group-hover:block"
+                    onClick={() =>
+                      handleDeleteConstruction({
+                        constructionId: construction._id,
+                      })
+                    }
+                  >
+                    <IoTrash size={24} className="hover:text-white" />
                   </span>
                 </NavLink>
               ))}
           </div>
         </div>
       ) : (
-        <div className="h-[92%] overflow-y-auto">
+        <div className="h-[82%] overflow-y-auto">
           <div className="bg-[#40414f] py-4 px-8 text-sm text-white">
             Please login for a better experience
           </div>
         </div>
       )}
       {isLoggedIn ? (
-        <div className="h-[8%] flex justify-center items-center gap-2 w-full border-t border-gray-600 px-4">
+        <div className="h-[10%] w-full flex justify-between items-center gap-1 border-t border-gray-600 px-4">
+          {userInfo && (
+            <div className="flex flex-2 gap-2 items-center">
+              <img
+                src={userInfo?.avatar}
+                alt=""
+                className="w-10 h-10 object-cover rounded-full"
+              />
+              <div className="flex flex-col">
+                <p className="text-xs font-bold text-white">
+                  {userInfo?.displayName || userInfo?.username}
+                </p>
+                <p className="text-xs font-bold text-gray-500">
+                  {userInfo?.email?.slice(0, 16) + "..."}
+                </p>
+              </div>
+            </div>
+          )}
           <Button
             primary
-            className="w-full bg-emerald-900 hover:bg-emerald-800"
+            className="w-[100px] bg-emerald-900 hover:bg-emerald-800"
             onClick={handleLogout}
           >
             Logout

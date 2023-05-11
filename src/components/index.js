@@ -9,6 +9,7 @@ import Select from "./Select";
 import Sidebar from "./Sidebar";
 import SocialForm from "./SocialForm";
 import Wrapper from "./Wrapper";
+import Title from "./Title";
 
 export {
   Button,
@@ -22,4 +23,5 @@ export {
   Sidebar,
   SocialForm,
   Wrapper,
+  Title,
 };

@@ -6,9 +6,9 @@ import {
 
 const calculateFunctionPointsThunkAction = createAsyncThunk(
   "calculate/calculateFunctionPoints",
-  async ({ userId, data }, thunkAPI) => {
+  async ({ data }, thunkAPI) => {
     try {
-      const res = await calculateFunctionPointsAPI({ userId, data });
+      const res = await calculateFunctionPointsAPI({ data });
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -18,9 +18,9 @@ const calculateFunctionPointsThunkAction = createAsyncThunk(
 
 const calculateSourceLinesOfCodeThunkAction = createAsyncThunk(
   "calculate/calculateSourceLinesOfCode",
-  async ({ userId, data }, thunkAPI) => {
+  async ({ data }, thunkAPI) => {
     try {
-      const res = await calculateSourceLinesOfCodeAPI({ userId, data });
+      const res = await calculateSourceLinesOfCodeAPI({ data });
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);

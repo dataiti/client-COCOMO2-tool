@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -30,8 +30,10 @@ import {
   Wrapper,
   Select,
   Modal,
+  Title,
 } from "../components";
 import LoginPage from "./LoginPage";
+import { saveConstructionThunkAction } from "../redux/features/constructionSlice";
 
 const projectNameSchema = yup.object({
   projectName: yup.string().required("Required !"),
@@ -39,6 +41,7 @@ const projectNameSchema = yup.object({
 
 const CalculatePage = () => {
   const [sizingMethod, setSizingMethod] = useState("SLOC");
+  const [resultState, setResultState] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const { isLoggedIn } = useSelector(authSelect);
@@ -85,6 +88,18 @@ const CalculatePage = () => {
     resolver: yupResolver(projectNameSchema),
   });
 
+  useEffect(() => {
+    if (result) {
+      setResultState({
+        softwareEAF: result?.softwareEAF,
+        softwareEffort: result?.softwareEffort,
+        softwareSchedule: result?.softwareSchedule,
+        totalEquivalentSize: result?.totalEquivalentSize,
+        cost: result?.cost,
+      });
+    }
+  }, [result]);
+
   const handleChangeTypeSizingMethod = (e) => {
     setSizingMethod(e.target.value);
     dispatch(clearResult());
@@ -94,29 +109,19 @@ const CalculatePage = () => {
   const handleCalculateCocomo = async (e) => {
     try {
       e.preventDefault();
-      if (!getValues().projectName) {
-        return;
-      }
       setIsLoading(true);
 
       let formatData = {
         ...getValues(),
         sizeType: sizingMethod,
-        typeSubmit: "calculate",
       };
       if (sizingMethod === "SLOC") {
         await dispatch(
-          calculateSourceLinesOfCodeThunkAction({
-            userId: userInfo?._id,
-            data: formatData,
-          })
+          calculateSourceLinesOfCodeThunkAction({ data: formatData })
         );
       } else if (sizingMethod === "FP") {
         await dispatch(
-          calculateFunctionPointsThunkAction({
-            userId: userInfo?._id,
-            data: formatData,
-          })
+          calculateFunctionPointsThunkAction({ data: formatData })
         );
       }
       setIsLoading(false);
@@ -134,32 +139,26 @@ const CalculatePage = () => {
       setIsLoading(true);
 
       let formatData = {
-        ...getValues(),
         sizeType: sizingMethod,
-        typeSubmit: "save",
+        ...getValues(),
+        ...resultState,
       };
-      if (sizingMethod === "SLOC") {
-        await dispatch(
-          calculateSourceLinesOfCodeThunkAction({
-            userId: userInfo?._id,
-            data: formatData,
-          })
-        );
-        dispatch(clearResult());
-        reset();
-      } else if (sizingMethod === "FP") {
-        await dispatch(
-          calculateFunctionPointsThunkAction({
-            userId: userInfo?._id,
-            data: formatData,
-          })
-        );
-      }
+      await dispatch(
+        saveConstructionThunkAction({
+          userId: userInfo?._id,
+          data: formatData,
+        })
+      );
+      dispatch(clearResult());
+      reset();
+
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
     }
   };
+
+  console.log(resultState);
 
   const handleResetConstruction = (e) => {
     e.preventDefault();
@@ -170,11 +169,7 @@ const CalculatePage = () => {
   return (
     <div className="flex flex-col gap-3 px-10 py-2 bg-slate-200/80">
       {isLoading && <Loading />}
-      <div className="flex items-center justify-center p-4">
-        <h3 className="font-extrabold text-2xl">
-          COCOMO II - Constructive Cost Model
-        </h3>
-      </div>
+      <Title />
       <form className="flex flex-col gap-2">
         <div className="grid grid-cols-6 gap-2">
           <div className="col-span-2 flex flex-col gap-4">
@@ -221,9 +216,9 @@ const CalculatePage = () => {
                   </div>
                 ))}
               </div>
-              <Button primary className="px-8 bg-green-600 hover:bg-green-500">
+              {/* <Button primary className="px-8 bg-green-600 hover:bg-green-500">
                 Import .CSV
-              </Button>
+              </Button> */}
             </div>
             {sizingMethod === "SLOC" ? (
               <>
@@ -354,11 +349,6 @@ const CalculatePage = () => {
               Reset
             </Button>
           </div>
-          <div className="flex items-center gap-2">
-            <Button primary className="px-8 bg-rose-900 hover:bg-rose-800">
-              Export .CSV
-            </Button>
-          </div>
         </div>
         <div className="h-[2px] w-full bg-gray-500 rounded-full"></div>
         <div className="flex flex-col gap-2 ">
@@ -391,6 +381,15 @@ const CalculatePage = () => {
               result={result?.softwareEAF}
             />
           </Wrapper>
+        </div>
+        <div>
+          <Label label="Acquisition Phase Distribution" isTitle />
+        </div>
+        <div>
+          <Label
+            label="Software Effort Distribution for RUP/MBASE (Person-Months)"
+            isTitle
+          />
         </div>
         <div>
           {/* <table className="w-full text-sm text-left  text-gray-400 cursor-pointer">

@@ -25,4 +25,38 @@ const getDetailConstructionAPI = async ({ userId, constructionId }) => {
   }
 };
 
-export { getListConstructionProjectAPI, getDetailConstructionAPI };
+const updateConstructionAPI = async ({ userId, constructionId }) => {
+  const res = await axiosClient.put(
+    `/construction/update-construction/${userId}/${constructionId}`
+  );
+  if (res) {
+    return res;
+  }
+};
+
+const deleteConstructionAPI = async ({ userId, constructionId }) => {
+  const res = await axiosClient.delete(
+    `/construction/delete-construction/${userId}/${constructionId}`
+  );
+  if (res) {
+    return res;
+  }
+};
+
+const saveConstructionAPI = async ({ userId, data }) => {
+  const res = await axiosClient.post(
+    `/construction/save-construction/${userId}`,
+    data
+  );
+  if (res) {
+    return res;
+  }
+};
+
+export {
+  getListConstructionProjectAPI,
+  getDetailConstructionAPI,
+  saveConstructionAPI,
+  updateConstructionAPI,
+  deleteConstructionAPI,
+};
