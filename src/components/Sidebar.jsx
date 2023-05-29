@@ -5,9 +5,10 @@ import { Link, NavLink } from "react-router-dom";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import Swal from "sweetalert2";
 
+import useDebounce from "../hooks/useDebounce";
 import logo from "../assets/cocomologo.jpg";
 import Button from "./Button";
-import { IoIosConstruct, IoMenu, IoTrash } from "../utils/icon";
+import { IoIosConstruct, IoMenu, IoTrash, FiSearch } from "../utils/icon";
 import { authSelect, logoutThunkAction } from "../redux/features/authSlice";
 import LoginPage from "../pages/LoginPage";
 import Modal from "./Modal";
@@ -26,6 +27,8 @@ const Sidebar = () => {
   const [sortBy, setSortBy] = useState("-_id");
   const [q, setQ] = useState("");
 
+  const debouncedValue = useDebounce(q, 500);
+
   const { userInfo, isLoggedIn } = useSelector(authSelect);
   const { listHistoryConstructions } = useSelector(constructionSelect);
 
@@ -40,7 +43,7 @@ const Sidebar = () => {
             userId: userInfo?._id,
             orderBy,
             sortBy,
-            q,
+            q: debouncedValue,
           })
         );
         setIsLoading(false);
@@ -49,7 +52,11 @@ const Sidebar = () => {
       }
     };
     fetchAPI();
-  }, [userInfo?._id, orderBy, sortBy, q, dispatch]);
+  }, [userInfo?._id, orderBy, sortBy, debouncedValue, dispatch]);
+
+  const handleSetQ = (e) => {
+    setQ(e.target.value);
+  };
 
   const handleLogout = () => {
     setIsLoading(true);
@@ -134,6 +141,21 @@ const Sidebar = () => {
             >
               New Project
             </Button>
+          </div>
+          <div className="px-4 mb-2">
+            <div className="relative bg-slate-600 rounded-full p-[1px]">
+              <input
+                type="text"
+                placeholder="Search construction ..."
+                className="text-white bg-transparent outline-none pl-16 py-3 px-4 placeholder:text-sm text-sm"
+                value={q}
+                onChange={handleSetQ}
+              />
+              <Button
+                leftIcon={<FiSearch size={20} />}
+                className="absolute flex items-center justify-center left-1 top-1/2 -translate-y-1/2 p-2 bg-slate-300 rounded-full"
+              />
+            </div>
           </div>
           <div className="flex flex-col h-full">
             {listHistoryConstructions.length > 0 &&

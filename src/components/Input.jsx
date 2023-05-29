@@ -7,7 +7,15 @@ const Input = ({
   name = "",
   control,
   placeholder = "",
+  setValue,
 }) => {
+  const handleChangeInput = (e) => {
+    if (e.target.value.startsWith("-")) {
+      return;
+    }
+    setValue(name, e.target.value);
+  };
+
   return (
     <Controller
       name={name}
@@ -23,6 +31,7 @@ const Input = ({
           }  placeholder:text-sm ${className}`}
           placeholder={placeholder}
           {...field}
+          onChange={handleChangeInput}
         />
       )}
     />

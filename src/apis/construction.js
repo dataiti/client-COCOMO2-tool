@@ -4,12 +4,11 @@ const getListConstructionProjectAPI = async ({
   userId,
   orderBy,
   sortBy,
-  q,
-  limit,
+  q = "",
   page,
 }) => {
   const res = await axiosClient.get(
-    `/construction/list-construction/${userId}?q=${q}&sortBy=${sortBy}&orderBy=${orderBy}&page=${page}&limit=${limit}`
+    `/construction/list-construction/${userId}?q=${q}&sortBy=${sortBy}&orderBy=${orderBy}&page=${page}`
   );
   if (res) {
     return res;

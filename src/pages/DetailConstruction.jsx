@@ -11,6 +11,8 @@ import { authSelect } from "../redux/features/authSlice";
 import { Button, Label, Loading, Title } from "../components";
 import { covertToDate, getDecimal, getFactorValue } from "../utils/fn";
 import { FaFileExport, RiFileEditFill } from "../utils/icon";
+import AcquisitionDistributeTable from "../components/AcquisitionDistributeTable";
+import SoftwareEffortDistributeTable from "../components/SoftwareEffortDistributeTable";
 
 const DetailConstruction = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -72,42 +74,57 @@ const DetailConstruction = () => {
             label="Software Development (Elaboration and Construction)"
             isTitle
           />
-          <table className="w-full text-sm text-left text-gray-400 cursor-pointer border  rounded-lg">
+          <table className="w-full text-sm text-left text-gray-400 cursor-pointer border rounded-lg">
             <thead className="text-black font-bold text-base bg-slate-300">
               <tr>
-                <th scope="col" className="px-6 py-3 border text-center">
+                <th
+                  scope="col"
+                  className="px-6 py-3 border border-gray-400  text-center"
+                >
                   Effort
                 </th>
-                <th scope="col" className="px-6 py-3 border text-center">
+                <th
+                  scope="col"
+                  className="px-6 py-3 border border-gray-400  text-center"
+                >
                   Schedule
                 </th>
-                <th scope="col" className="px-6 py-3 border text-center">
+                <th
+                  scope="col"
+                  className="px-6 py-3 border border-gray-400  text-center"
+                >
                   Cost
                 </th>
-                <th scope="col" className="px-6 py-3 border text-center">
+                <th
+                  scope="col"
+                  className="px-6 py-3 border border-gray-400  text-center"
+                >
                   Total Equivalent Size
                 </th>
-                <th scope="col" className="px-6 py-3 border text-center">
+                <th
+                  scope="col"
+                  className="px-6 py-3 border border-gray-400  text-center"
+                >
                   Effort Adjustment Factor (EAF)
                 </th>
               </tr>
             </thead>
 
             <tbody>
-              <tr className="bg-white border-b hover:bg-gray-100 ">
-                <td className="px-6 text-lg py-4 border text-center text-yellow-600 font-bold">
+              <tr className="bg-white border border-gray-400 hover:bg-gray-100 ">
+                <td className="px-6 text-lg py-4 border border-gray-400  text-center text-yellow-600 font-bold">
                   {getDecimal(Number(construction?.softwareEffort))}
                 </td>
-                <td className="px-6 text-lg py-4 border text-center text-yellow-600 font-bold">
+                <td className="px-6 text-lg py-4 border border-gray-400  text-center text-yellow-600 font-bold">
                   {getDecimal(Number(construction?.softwareSchedule))}
                 </td>
-                <td className="px-6 py-4 border text-center text-yellow-600 font-bold text-lg">
+                <td className="px-6 py-4 border border-gray-400  text-center text-yellow-600 font-bold text-lg">
                   {getDecimal(Number(construction?.cost))}
                 </td>
-                <td className="px-6 text-lg py-4 border text-center text-yellow-600 font-bold">
+                <td className="px-6 text-lg py-4 border border-gray-400  text-center text-yellow-600 font-bold">
                   {getDecimal(Number(construction?.totalEquivalentSize))}
                 </td>
-                <td className="px-6 text-lg text-yellow-600 font-bold py-4 border text-center">
+                <td className="px-6 text-lg text-yellow-600 font-bold py-4 border border-gray-400  text-center">
                   {getDecimal(Number(construction?.softwareEAF))}
                 </td>
               </tr>
@@ -116,12 +133,14 @@ const DetailConstruction = () => {
         </div>
         <div>
           <Label label="Acquisition Phase Distribution" isTitle />
+          <AcquisitionDistributeTable result={construction} />
         </div>
         <div>
           <Label
             label="Software Effort Distribution for RUP/MBASE (Person-Months)"
             isTitle
           />
+          <SoftwareEffortDistributeTable result={construction} />
         </div>
         <p className="w-full h-[2px] bg-slate-900 rounded-full"></p>
         <div className="grid grid-cols-2 gap-2">
@@ -316,9 +335,11 @@ const DetailConstruction = () => {
           <div dangerouslySetInnerHTML={{ __html: htmlData }} />
         </div>
         {isViewPDF && (
-          <PDFViewer width={"100%"} height={1024}>
-            <PDFDocument data={construction} />
-          </PDFViewer>
+          <div className="overflow-hidden rounded-lg">
+            <PDFViewer width={"100%"} height={1200}>
+              <PDFDocument data={construction} />
+            </PDFViewer>
+          </div>
         )}
       </div>
     </div>

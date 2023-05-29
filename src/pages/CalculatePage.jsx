@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -34,14 +34,26 @@ import {
 } from "../components";
 import LoginPage from "./LoginPage";
 import { saveConstructionThunkAction } from "../redux/features/constructionSlice";
+import { toast } from "react-toastify";
+import AcquisitionDistributeTable from "../components/AcquisitionDistributeTable";
+import SoftwareEffortDistributeTable from "../components/SoftwareEffortDistributeTable";
+import VerticalBarChart from "../components/VerticalBarChart";
 
 const projectNameSchema = yup.object({
   projectName: yup.string().required("Required !"),
 });
 
+const data = [
+  {
+    _id: 123456,
+    value: 23,
+  },
+];
+
 const CalculatePage = () => {
   const [sizingMethod, setSizingMethod] = useState("SLOC");
   const [resultState, setResultState] = useState({});
+  const [dataChart, setDataChart] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { isLoggedIn } = useSelector(authSelect);
@@ -50,7 +62,7 @@ const CalculatePage = () => {
   const { result } = useSelector(calculateSelect);
   const { userInfo } = useSelector(authSelect);
 
-  const { control, reset, getValues } = useForm({
+  const { control, reset, getValues, setValue } = useForm({
     defaultValues: {
       projectName: "",
       language: "basic",
@@ -88,6 +100,14 @@ const CalculatePage = () => {
     resolver: yupResolver(projectNameSchema),
   });
 
+  const data = useMemo(() => {
+    const results = () => {
+      
+    };
+    results();
+  }, []);
+
+
   useEffect(() => {
     if (result) {
       setResultState({
@@ -96,6 +116,54 @@ const CalculatePage = () => {
         softwareSchedule: result?.softwareSchedule,
         totalEquivalentSize: result?.totalEquivalentSize,
         cost: result?.cost,
+        inceptionEffort: result?.inceptionEffort,
+        inceptionSchedule: result?.inceptionSchedule,
+        inceptionAverageStaff: result?.inceptionAverageStaff,
+        inceptionCost: result?.inceptionCost,
+        elaborationEffort: result?.elaborationEffort,
+        elaborationSchedule: result?.elaborationSchedule,
+        elaborationAverageStaff: result?.elaborationAverageStaff,
+        elaborationCost: result?.elaborationCost,
+        constructionEffort: result?.constructionEffort,
+        constructionSchedule: result?.constructionSchedule,
+        constructionAverageStaff: result?.constructionAverageStaff,
+        constructionCost: result?.constructionCost,
+        transitionEffort: result?.transitionEffort,
+        transitionSchedule: result?.transitionSchedule,
+        transitionAverageStaff: result?.transitionAverageStaff,
+        transitionCost: result?.transitionCost,
+
+        managementInception: result?.managementInception,
+        environmentPerCMInception: result?.environmentPerCMInception,
+        requirementsInception: result?.requirementsInception,
+        designInception: result?.designInception,
+        implementationInception: result?.implementationInception,
+        assessmentInception: result?.assessmentInception,
+        deploymentInception: result?.deploymentInception,
+
+        managementElaboration: result?.managementElaboration,
+        environmentPerCMElaboration: result?.environmentPerCMElaboration,
+        requirementsElaboration: result?.requirementsElaboration,
+        designElaboration: result?.designElaboration,
+        implementationElaboration: result?.implementationElaboration,
+        assessmentElaboration: result?.assessmentElaboration,
+        deploymentElaboration: result?.deploymentElaboration,
+
+        managementConstruction: result?.managementConstruction,
+        environmentPerCMConstruction: result?.environmentPerCMConstruction,
+        requirementsConstruction: result?.requirementsConstruction,
+        designConstruction: result?.designConstruction,
+        implementationConstruction: result?.implementationConstruction,
+        assessmentConstruction: result?.assessmentConstruction,
+        deploymentConstruction: result?.deploymentConstruction,
+
+        managementTransition: result?.managementTransition,
+        environmentPerCMTransition: result?.environmentPerCMTransition,
+        requirementsTransition: result?.requirementsTransition,
+        designTransition: result?.designTransition,
+        implementationTransition: result?.implementationTransition,
+        assessmentTransition: result?.assessmentTransition,
+        deploymentTransition: result?.deploymentTransition,
       });
     }
   }, [result]);
@@ -143,12 +211,15 @@ const CalculatePage = () => {
         ...getValues(),
         ...resultState,
       };
-      await dispatch(
+      const res = await dispatch(
         saveConstructionThunkAction({
           userId: userInfo?._id,
           data: formatData,
         })
       );
+      if (res.payload.success) {
+        toast.success("Save construction successfullty");
+      }
       dispatch(clearResult());
       reset();
 
@@ -157,8 +228,6 @@ const CalculatePage = () => {
       setIsLoading(false);
     }
   };
-
-  console.log(resultState);
 
   const handleResetConstruction = (e) => {
     e.preventDefault();
@@ -176,7 +245,11 @@ const CalculatePage = () => {
             <div className="grid grid-cols-4 gap-6">
               <div className="col-span-3 flex flex-col gap-2">
                 <Label label="Project Name" isTitle />
-                <Input name="projectName" control={control} />
+                <Input
+                  name="projectName"
+                  control={control}
+                  setValue={setValue}
+                />
               </div>
             </div>
             {sizingMethod === "SLOC" && (
@@ -184,15 +257,30 @@ const CalculatePage = () => {
                 <Label label="Type Mode" isTitle />
                 <div className="flex flex-col gap-3">
                   <div className="col-span-3 flex items-center gap-3">
-                    <Input type="radio" name="typeModel" control={control} />
+                    <Input
+                      type="radio"
+                      name="typeModel"
+                      control={control}
+                      setValue={setValue}
+                    />
                     <Label label="Basic Mode" />
                   </div>
                   <div className="col-span-3 flex items-center gap-3">
-                    <Input type="radio" name="typeModel" control={control} />
+                    <Input
+                      type="radio"
+                      name="typeModel"
+                      control={control}
+                      setValue={setValue}
+                    />
                     <Label label="Intermediate Mode" />
                   </div>
                   <div className="col-span-3 flex items-center gap-3">
-                    <Input type="radio" name="typeModel" control={control} />
+                    <Input
+                      type="radio"
+                      name="typeModel"
+                      control={control}
+                      setValue={setValue}
+                    />
                     <Label label="Advanced Mode" />
                   </div>
                 </div>
@@ -241,15 +329,35 @@ const CalculatePage = () => {
                 </div>
                 <div className="grid grid-cols-6 gap-2">
                   <Label label="New" />
-                  <Input name="newSize" control={control} />
+                  <Input name="newSize" control={control} setValue={setValue} />
                 </div>
                 <div className="grid grid-cols-6 gap-2">
                   <Label label="Reuse" />
-                  <Input name="reusedSize" control={control} />
-                  <Input name="reusedDM" control={control} />
-                  <Input name="reusedCM" control={control} />
-                  <Input name="reusedIM" control={control} />
-                  <Input name="reusedAA" control={control} />
+                  <Input
+                    name="reusedSize"
+                    control={control}
+                    setValue={setValue}
+                  />
+                  <Input
+                    name="reusedDM"
+                    control={control}
+                    setValue={setValue}
+                  />
+                  <Input
+                    name="reusedCM"
+                    control={control}
+                    setValue={setValue}
+                  />
+                  <Input
+                    name="reusedIM"
+                    control={control}
+                    setValue={setValue}
+                  />
+                  <Input
+                    name="reusedAA"
+                    control={control}
+                    setValue={setValue}
+                  />
                 </div>
               </>
             ) : (
@@ -257,7 +365,11 @@ const CalculatePage = () => {
                 <div className="grid grid-cols-7 gap-4">
                   <div className="col-span-4 flex items-center gap-2">
                     <Label label="Unadjusted Function Points" />
-                    <Input name="functionPoints" control={control} />
+                    <Input
+                      name="functionPoints"
+                      control={control}
+                      setValue={setValue}
+                    />
                   </div>
                   {languageFactor.map((item, index) => (
                     <div
@@ -268,6 +380,7 @@ const CalculatePage = () => {
                       <Controller
                         name="language"
                         control={control}
+                        setValue={setValue}
                         defaultValue="basic"
                         render={({ field }) => (
                           <Select field={field}>
@@ -291,11 +404,13 @@ const CalculatePage = () => {
             factorial={softwareScaleDrivers}
             title=" Software Scale Drivers"
             control={control}
+            setValue={setValue}
           />
           <Factorial
             factorial={softwareCostDriversProduct}
             title="Software Cost Drivers Product"
             control={control}
+            setValue={setValue}
           />
         </div>
 
@@ -304,15 +419,30 @@ const CalculatePage = () => {
             factorial={personnel}
             title="Personnel"
             control={control}
+            setValue={setValue}
           />
-          <Factorial factorial={platform} title="Platform" control={control} />
-          <Factorial factorial={project} title="Project" control={control} />
+          <Factorial
+            factorial={platform}
+            title="Platform"
+            control={control}
+            setValue={setValue}
+          />
+          <Factorial
+            factorial={project}
+            title="Project"
+            control={control}
+            setValue={setValue}
+          />
         </div>
         <div className="flex flex-col">
           <Label label="Software Labor Rates" isTitle />
           <div className="flex items-center gap-4">
             <Label label="Cost per Person-Month (Dollars)" />
-            <Input name="softwareLaborCostPerPM" control={control} />
+            <Input
+              name="softwareLaborCostPerPM"
+              control={control}
+              setValue={setValue}
+            />
           </div>
         </div>
         <div className="flex items-center justify-between">
@@ -382,52 +512,19 @@ const CalculatePage = () => {
             />
           </Wrapper>
         </div>
-        <div>
-          <Label label="Acquisition Phase Distribution" isTitle />
+        <div className="flex gap-5">
+          <div>
+            <Label label="Acquisition Phase Distribution" isTitle />
+            <AcquisitionDistributeTable result={result} />
+          </div>
+          <div>{/* <VerticalBarChart data={data} /> */}</div>
         </div>
         <div>
           <Label
             label="Software Effort Distribution for RUP/MBASE (Person-Months)"
             isTitle
           />
-        </div>
-        <div>
-          {/* <table className="w-full text-sm text-left  text-gray-400 cursor-pointer">
-            <thead className="text-xs border-b  text-gray-700 uppercase bg-slate-200">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Phase
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Effort (Person-months)
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Schedule (Months)
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Average Staff
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Cost (Dollars)
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {[" ", " ", " "].map((product, index) => {
-                return (
-                  <tr className="bg-white border-b hover:bg-gray-100 ">
-                    <td className="px-6 text-sm py-2 text-gray-500">0</td>
-
-                    <td className="px-6 text-sm py-2 text-gray-500">0</td>
-                    <td className="px-6 py-2 text-gray-500 text-sm">0</td>
-                    <td className="px-6 text-sm py-2 text-gray-500">0</td>
-                    <td className="px-6 text-sm text-gray-500 py-2"></td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table> */}
+          <SoftwareEffortDistributeTable result={result} />
         </div>
       </form>
     </div>

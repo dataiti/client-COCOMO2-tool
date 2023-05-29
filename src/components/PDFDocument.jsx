@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     alignItems: "",
     flexWrap: "wrap",
     gap: 2,
-    padding: 20,
+    padding: "10 60 10 60",
   },
   title: {
     fontSize: 20,
@@ -38,19 +38,38 @@ function PDFDocument({ data }) {
 
           <Text>
             - Project Onwer:{" "}
-            {data?.projectName?.displayName ||
-              data?.projectName?.username ||
-              data?.projectName?.email}
+            {data?.ownerProject?.email || data?.ownerProject?.displayName}
           </Text>
           <Text>- Project Name: {data?.projectName}</Text>
           <Text>
             - Size Type:{" "}
             {`${
-              data?.projectName === "SLOC"
+              data?.sizeType === "SLOC"
                 ? "Source Lines of Code"
                 : "Function Points"
             }`}
           </Text>
+
+          {data?.sizeType === "SLOC" ? (
+            <>
+              <Text>- New SLOC: {data?.newSize || "0"} %</Text>
+              <Text>- Reused % SLOC: {data?.reusedSize || "0"} %</Text>
+              <Text>
+                - Reused % Integration Required: {data?.reusedIM || "0"} %
+              </Text>
+              <Text>
+                - Reused % Assessment and Assimilation(0% - 8%):{" "}
+                {data?.reusedAA || "0"} %
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text>
+                - Unadjusted Function Points: {data?.functionPoints || "0"}
+              </Text>
+              <Text>- Language: {data?.language || "0"}</Text>
+            </>
+          )}
 
           <Text style={styles.title}>Factorials</Text>
 
@@ -152,13 +171,6 @@ function PDFDocument({ data }) {
             - Effort Adjustment Factor (EAF):{" "}
             {getDecimal(Number(data?.softwareEAF))}
           </Text>
-          {/* <Text>- New SLOC: {data?.projectName}</Text>
-          <Text>- Reused % Integration Required: {data?.projectName}</Text>
-          <Text>
-            - Reused % Assessment and Assimilation(0% - 8%): {data?.projectName}
-          </Text>
-          <Text>- Effort: {data?.projectName}</Text>
-          <Text>: {data?.projectName}</Text> */}
         </View>
       </Page>
     </Document>

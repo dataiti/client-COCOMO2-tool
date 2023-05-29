@@ -4,6 +4,7 @@ import { FaFileExport } from "react-icons/fa";
 import { IoCloseCircleSharp, IoTrash, IoMenu } from "react-icons/io5";
 import { IoIosConstruct } from "react-icons/io";
 import { RiFileEditFill } from "react-icons/ri";
+import { FiSearch } from "react-icons/fi";
 
 export {
   AiOutlinePlusCircle,
@@ -14,4 +15,5 @@ export {
   IoMenu,
   FaFileExport,
   RiFileEditFill,
+  FiSearch,
 };

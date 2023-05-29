@@ -1,7 +1,12 @@
 import { factorials } from "./constant";
 
 const getDecimal = (number) => {
+  if (!number) return 0;
   return parseFloat(number.toFixed(1));
+};
+const getDecimalInt = (number) => {
+  if (!number) return 0;
+  return Math.round(number);
 };
 
 const covertToDate = (dateString) => {
@@ -19,4 +24,4 @@ const getFactorValue = (factor) => {
   return item[key][factor[key]];
 };
 
-export { getDecimal, covertToDate, getFactorValue };
+export { getDecimal, covertToDate, getFactorValue, getDecimalInt };

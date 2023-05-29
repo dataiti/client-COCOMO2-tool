@@ -9,14 +9,13 @@ import {
 
 const getListConstructionProjectThunkAction = createAsyncThunk(
   "construction/getListConstructionProject",
-  async ({ userId, orderBy, sortBy, q, limit, page }, thunkAPI) => {
+  async ({ userId, orderBy, sortBy, q = "", limit, page }, thunkAPI) => {
     try {
       const res = await getListConstructionProjectAPI({
         userId,
         orderBy,
         sortBy,
         q,
-        limit,
         page,
       });
       return res;
