@@ -35,6 +35,7 @@ const RegisterPage = () => {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting, isValid },
   } = useForm({
     mode: "onChange",
@@ -80,6 +81,7 @@ const RegisterPage = () => {
             name="username"
             placeholder="Enter your username"
             className="rounded-full py-3 px-4"
+            setValue={setValue}
             // errors={errors.password}
           />
         </div>
@@ -91,6 +93,7 @@ const RegisterPage = () => {
             type="email"
             placeholder="Enter your email"
             className="rounded-full py-3 px-4"
+            setValue={setValue}
             //   errors={errors.email}
           />
         </div>
@@ -104,6 +107,7 @@ const RegisterPage = () => {
             className="rounded-full py-3 px-4"
             isInputPassword
             // errors={errors.password}
+            setValue={setValue}
           />
         </div>
 

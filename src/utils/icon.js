@@ -5,6 +5,7 @@ import { IoCloseCircleSharp, IoTrash, IoMenu } from "react-icons/io5";
 import { IoIosConstruct } from "react-icons/io";
 import { RiFileEditFill } from "react-icons/ri";
 import { FiSearch } from "react-icons/fi";
+import { BiLoaderCircle } from "react-icons/bi";
 
 export {
   AiOutlinePlusCircle,
@@ -16,4 +17,5 @@ export {
   FaFileExport,
   RiFileEditFill,
   FiSearch,
+  BiLoaderCircle,
 };

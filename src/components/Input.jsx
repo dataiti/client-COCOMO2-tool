@@ -10,10 +10,14 @@ const Input = ({
   setValue,
 }) => {
   const handleChangeInput = (e) => {
-    if (e.target.value.startsWith("-")) {
+    const inputValue = e.target.value;
+    if (inputValue < 0) {
       return;
     }
-    setValue(name, e.target.value);
+    if (name === "reusedAA" && inputValue > 8) {
+      return;
+    }
+    setValue(name, inputValue);
   };
 
   return (
@@ -26,10 +30,11 @@ const Input = ({
           type={type}
           className={`outline-none border border-gray-300 rounded-md py-1 px-2 ${
             name === "reusedDM" || name === "reusedCM"
-              ? "select-none opacity-50 cursor-not-allowed"
+              ? "select-none pointer-events-none opacity-50"
               : ""
           }  placeholder:text-sm ${className}`}
           placeholder={placeholder}
+          spellCheck={false}
           {...field}
           onChange={handleChangeInput}
         />

@@ -26,6 +26,10 @@ const DetailConstruction = () => {
   const { userInfo } = useSelector(authSelect);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const fetchGetConstructionAPI = async () => {
       try {
         setIsLoading(true);
@@ -321,6 +325,7 @@ const DetailConstruction = () => {
             primary
             leftIcon={<RiFileEditFill size={18} />}
             className="px-8 bg-sky-900 hover:bg-sky-800"
+            to={`/update-construction/${id}`}
           >
             Start Edit
           </Button>

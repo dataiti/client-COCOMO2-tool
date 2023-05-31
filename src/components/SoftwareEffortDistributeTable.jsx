@@ -3,7 +3,7 @@ import { getDecimal } from "../utils/fn";
 
 const SoftwareEffortDistributeTable = ({ result = {} }) => {
   return (
-    <div className="w-[700px]">
+    <div className="w-[700px] ">
       <table className="w-full text-sm text-center font-bold cursor-pointer rounded-md">
         <thead className="text-sm border-b text-emerald-700 bg-amber-50">
           <tr>

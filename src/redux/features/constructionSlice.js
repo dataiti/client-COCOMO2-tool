@@ -51,9 +51,9 @@ const saveConstructionThunkAction = createAsyncThunk(
 
 const updateConstructionThunkAction = createAsyncThunk(
   "construction/updateConstruction",
-  async ({ userId, constructionId }, thunkAPI) => {
+  async ({ userId, constructionId, data }, thunkAPI) => {
     try {
-      const res = await updateConstructionAPI({ userId, constructionId });
+      const res = await updateConstructionAPI({ userId, constructionId, data });
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -118,7 +118,8 @@ const constructionSlice = createSlice({
         if (findIndex !== -1) {
           state.listHistoryConstructions.splice(findIndex, 1);
         }
-      });
+      })
+      .addCase(updateConstructionThunkAction.fulfilled, (state, action) => {});
   },
 });
 

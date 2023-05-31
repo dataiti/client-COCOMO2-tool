@@ -1,14 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import Swal from "sweetalert2";
 
 import useDebounce from "../hooks/useDebounce";
 import logo from "../assets/cocomologo.jpg";
 import Button from "./Button";
-import { IoIosConstruct, IoMenu, IoTrash, FiSearch } from "../utils/icon";
+import {
+  IoIosConstruct,
+  IoMenu,
+  IoTrash,
+  FiSearch,
+  BiLoaderCircle,
+  IoCloseCircleSharp,
+} from "../utils/icon";
 import { authSelect, logoutThunkAction } from "../redux/features/authSlice";
 import LoginPage from "../pages/LoginPage";
 import Modal from "./Modal";
@@ -20,6 +27,7 @@ import {
   deleteConstructionThunkAction,
   getListConstructionProjectThunkAction,
 } from "../redux/features/constructionSlice";
+import { clearResult } from "../redux/features/caculateSlice";
 
 const Sidebar = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,25 +35,30 @@ const Sidebar = () => {
   const [sortBy, setSortBy] = useState("-_id");
   const [q, setQ] = useState("");
 
+  const inputRef = useRef();
+
   const debouncedValue = useDebounce(q, 500);
 
   const { userInfo, isLoggedIn } = useSelector(authSelect);
   const { listHistoryConstructions } = useSelector(constructionSelect);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAPI = async () => {
       try {
         setIsLoading(true);
-        await dispatch(
-          getListConstructionProjectThunkAction({
-            userId: userInfo?._id,
-            orderBy,
-            sortBy,
-            q: debouncedValue,
-          })
-        );
+        if (isLoggedIn) {
+          await dispatch(
+            getListConstructionProjectThunkAction({
+              userId: userInfo?._id,
+              orderBy,
+              sortBy,
+              q: debouncedValue,
+            })
+          );
+        }
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
@@ -58,6 +71,17 @@ const Sidebar = () => {
     setQ(e.target.value);
   };
 
+  const handleNewProject = () => {
+    dispatch(clearResult());
+    navigate("/calculate");
+    window.scrollTo(0, 0);
+  };
+
+  const handleClear = () => {
+    setQ("");
+    inputRef.current.focus();
+  };
+
   const handleLogout = () => {
     setIsLoading(true);
     dispatch(logoutThunkAction({ refreshToken: userInfo?.refreshToken }))
@@ -66,6 +90,9 @@ const Sidebar = () => {
         toast.success("Logout successfully !");
         dispatch(clearListHistoryConstructions());
         setIsLoading(false);
+      })
+      .then(() => {
+        navigate("/calculate");
       })
       .catch(() => {
         setIsLoading(false);
@@ -96,6 +123,7 @@ const Sidebar = () => {
             "Deleted construction in construction history list.",
             "Successfully!"
           );
+          navigate("/calculate");
         }
         setIsLoading(false);
       });
@@ -132,25 +160,40 @@ const Sidebar = () => {
       )}
       {isLoggedIn ? (
         <div className="h-[76%]  overflow-y-auto">
-          <div className="px-4 py-2">
+          <div className="px-2 py-2">
             <Button
               outline
               className="w-full rounded-full hover:bg-slate-800 transition-all"
               leftIcon={<AiOutlinePlusCircle size={18} />}
-              to="/calculate"
+              onClick={handleNewProject}
             >
               New Project
             </Button>
           </div>
-          <div className="px-4 mb-2">
-            <div className="relative bg-slate-600 rounded-full p-[1px]">
+          <div className="px-2 mb-2">
+            <div className="relative w-full p-1 rounded-full flex items-center bg-gray-50 z-10">
               <input
+                ref={inputRef}
                 type="text"
                 placeholder="Search construction ..."
-                className="text-white bg-transparent outline-none pl-16 py-3 px-4 placeholder:text-sm text-sm"
+                className="outline-none text-sm flex-1 py-2 pl-12 placeholder:text-sm bg-transparent"
                 value={q}
                 onChange={handleSetQ}
+                spellCheck={false}
               />
+              {!!q && !isLoading && (
+                <span
+                  className="text-gray-600 hover:text-gray-500 cursor-pointer"
+                  onClick={handleClear}
+                >
+                  <IoCloseCircleSharp size={24} />
+                </span>
+              )}
+              {isLoading && (
+                <span className="animate-spin text-gray-600">
+                  <BiLoaderCircle size={24} />
+                </span>
+              )}
               <Button
                 leftIcon={<FiSearch size={20} />}
                 className="absolute flex items-center justify-center left-1 top-1/2 -translate-y-1/2 p-2 bg-slate-300 rounded-full"

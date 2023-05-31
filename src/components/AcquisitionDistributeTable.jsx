@@ -2,9 +2,8 @@ import React from "react";
 import { getDecimal, getDecimalInt } from "../utils/fn";
 
 const AcquisitionDistributeTable = ({ result = {} }) => {
-  console.log("result", result);
   return (
-    <div className="w-[600px]">
+    <div className="w-[600px] ">
       <table className="w-full text-sm text-center font-bold text-gray-400 cursor-pointer rounded-md">
         <thead className="text-sm border-b text-emerald-700 bg-amber-50">
           <tr>

@@ -35,6 +35,7 @@ const LoginPage = () => {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { isSubmitting, isValid },
   } = useForm({
     mode: "onChange",
@@ -84,6 +85,7 @@ const LoginPage = () => {
             type="email"
             placeholder="Enter your email"
             className="rounded-full py-3 px-4"
+            setValue={setValue}
             //   errors={errors.email}
           />
         </div>
@@ -96,6 +98,7 @@ const LoginPage = () => {
             placeholder="Enter your password"
             className="rounded-full py-3 px-4"
             isInputPassword
+            setValue={setValue}
             // errors={errors.password}
           />
         </div>

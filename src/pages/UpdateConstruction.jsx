@@ -33,25 +33,32 @@ import {
   Title,
 } from "../components";
 import LoginPage from "./LoginPage";
-import { saveConstructionThunkAction } from "../redux/features/constructionSlice";
+import {
+  constructionSelect,
+  getDetailConstructionThunkAction,
+  saveConstructionThunkAction,
+  updateConstructionThunkAction,
+} from "../redux/features/constructionSlice";
 import { toast } from "react-toastify";
 import AcquisitionDistributeTable from "../components/AcquisitionDistributeTable";
 import SoftwareEffortDistributeTable from "../components/SoftwareEffortDistributeTable";
 import VerticalBarChart from "../components/VerticalBarChart";
+import { useParams } from "react-router-dom";
 
 const projectNameSchema = yup.object({
   projectName: yup.string().required("Required !"),
 });
 
-const CalculatePage = () => {
+const UpdateConstruction = () => {
   const [sizingMethod, setSizingMethod] = useState("SLOC");
   const [resultState, setResultState] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const { id } = useParams();
   const { isLoggedIn } = useSelector(authSelect);
+  const { result } = useSelector(calculateSelect);
 
   const dispatch = useDispatch();
-  const { result } = useSelector(calculateSelect);
   const { userInfo } = useSelector(authSelect);
 
   const { control, reset, getValues, setValue } = useForm({
@@ -98,64 +105,94 @@ const CalculatePage = () => {
   }, []);
 
   useEffect(() => {
-    if (result) {
-      setResultState({
-        softwareEAF: result?.softwareEAF,
-        softwareEffort: result?.softwareEffort,
-        softwareSchedule: result?.softwareSchedule,
-        totalEquivalentSize: result?.totalEquivalentSize,
-        cost: result?.cost,
-        inceptionEffort: result?.inceptionEffort,
-        inceptionSchedule: result?.inceptionSchedule,
-        inceptionAverageStaff: result?.inceptionAverageStaff,
-        inceptionCost: result?.inceptionCost,
-        elaborationEffort: result?.elaborationEffort,
-        elaborationSchedule: result?.elaborationSchedule,
-        elaborationAverageStaff: result?.elaborationAverageStaff,
-        elaborationCost: result?.elaborationCost,
-        constructionEffort: result?.constructionEffort,
-        constructionSchedule: result?.constructionSchedule,
-        constructionAverageStaff: result?.constructionAverageStaff,
-        constructionCost: result?.constructionCost,
-        transitionEffort: result?.transitionEffort,
-        transitionSchedule: result?.transitionSchedule,
-        transitionAverageStaff: result?.transitionAverageStaff,
-        transitionCost: result?.transitionCost,
+    window.scrollTo(0, 0);
+  }, []);
 
-        managementInception: result?.managementInception,
-        environmentPerCMInception: result?.environmentPerCMInception,
-        requirementsInception: result?.requirementsInception,
-        designInception: result?.designInception,
-        implementationInception: result?.implementationInception,
-        assessmentInception: result?.assessmentInception,
-        deploymentInception: result?.deploymentInception,
+  useEffect(() => {
+    const fetchGetConstructionAPI = async () => {
+      try {
+        setIsLoading(true);
+        const res = await dispatch(
+          getDetailConstructionThunkAction({
+            userId: userInfo?._id,
+            constructionId: id,
+          })
+        );
 
-        managementElaboration: result?.managementElaboration,
-        environmentPerCMElaboration: result?.environmentPerCMElaboration,
-        requirementsElaboration: result?.requirementsElaboration,
-        designElaboration: result?.designElaboration,
-        implementationElaboration: result?.implementationElaboration,
-        assessmentElaboration: result?.assessmentElaboration,
-        deploymentElaboration: result?.deploymentElaboration,
+        if (res.payload.success) {
+          reset({ ...res.payload.data });
+          setResultState({
+            softwareEAF: res.payload.data?.softwareEAF,
+            softwareEffort: res.payload.data?.softwareEffort,
+            softwareSchedule: res.payload.data?.softwareSchedule,
+            totalEquivalentSize: res.payload.data?.totalEquivalentSize,
+            cost: res.payload.data?.cost,
+            inceptionEffort: res.payload.data?.inceptionEffort,
+            inceptionSchedule: res.payload.data?.inceptionSchedule,
+            inceptionAverageStaff: res.payload.data?.inceptionAverageStaff,
+            inceptionCost: res.payload.data?.inceptionCost,
+            elaborationEffort: res.payload.data?.elaborationEffort,
+            elaborationSchedule: res.payload.data?.elaborationSchedule,
+            elaborationAverageStaff: res.payload.data?.elaborationAverageStaff,
+            elaborationCost: res.payload.data?.elaborationCost,
+            constructionEffort: res.payload.data?.constructionEffort,
+            constructionSchedule: res.payload.data?.constructionSchedule,
+            constructionAverageStaff:
+              res.payload.data?.constructionAverageStaff,
+            constructionCost: res.payload.data?.constructionCost,
+            transitionEffort: res.payload.data?.transitionEffort,
+            transitionSchedule: res.payload.data?.transitionSchedule,
+            transitionAverageStaff: res.payload.data?.transitionAverageStaff,
+            transitionCost: res.payload.data?.transitionCost,
 
-        managementConstruction: result?.managementConstruction,
-        environmentPerCMConstruction: result?.environmentPerCMConstruction,
-        requirementsConstruction: result?.requirementsConstruction,
-        designConstruction: result?.designConstruction,
-        implementationConstruction: result?.implementationConstruction,
-        assessmentConstruction: result?.assessmentConstruction,
-        deploymentConstruction: result?.deploymentConstruction,
+            managementInception: res.payload.data?.managementInception,
+            environmentPerCMInception:
+              res.payload.data?.environmentPerCMInception,
+            requirementsInception: res.payload.data?.requirementsInception,
+            designInception: res.payload.data?.designInception,
+            implementationInception: res.payload.data?.implementationInception,
+            assessmentInception: res.payload.data?.assessmentInception,
+            deploymentInception: res.payload.data?.deploymentInception,
 
-        managementTransition: result?.managementTransition,
-        environmentPerCMTransition: result?.environmentPerCMTransition,
-        requirementsTransition: result?.requirementsTransition,
-        designTransition: result?.designTransition,
-        implementationTransition: result?.implementationTransition,
-        assessmentTransition: result?.assessmentTransition,
-        deploymentTransition: result?.deploymentTransition,
-      });
-    }
-  }, [result]);
+            managementElaboration: res.payload.data?.managementElaboration,
+            environmentPerCMElaboration:
+              res.payload.data?.environmentPerCMElaboration,
+            requirementsElaboration: res.payload.data?.requirementsElaboration,
+            designElaboration: res.payload.data?.designElaboration,
+            implementationElaboration:
+              res.payload.data?.implementationElaboration,
+            assessmentElaboration: res.payload.data?.assessmentElaboration,
+            deploymentElaboration: res.payload.data?.deploymentElaboration,
+
+            managementConstruction: res.payload.data?.managementConstruction,
+            environmentPerCMConstruction:
+              res.payload.data?.environmentPerCMConstruction,
+            requirementsConstruction:
+              res.payload.data?.requirementsConstruction,
+            designConstruction: res.payload.data?.designConstruction,
+            implementationConstruction:
+              res.payload.data?.implementationConstruction,
+            assessmentConstruction: res.payload.data?.assessmentConstruction,
+            deploymentConstruction: res.payload.data?.deploymentConstruction,
+
+            managementTransition: res.payload.data?.managementTransition,
+            environmentPerCMTransition:
+              res.payload.data?.environmentPerCMTransition,
+            requirementsTransition: res.payload.data?.requirementsTransition,
+            designTransition: res.payload.data?.designTransition,
+            implementationTransition:
+              res.payload.data?.implementationTransition,
+            assessmentTransition: res.payload.data?.assessmentTransition,
+            deploymentTransition: res.payload.data?.deploymentTransition,
+          });
+        }
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+      }
+    };
+    fetchGetConstructionAPI();
+  }, [userInfo?._id, id, dispatch]);
 
   const handleChangeTypeSizingMethod = (e) => {
     setSizingMethod(e.target.value);
@@ -187,6 +224,7 @@ const CalculatePage = () => {
         ...getValues(),
         sizeType: sizingMethod,
       };
+      console.log(formatData);
       if (sizingMethod === "SLOC") {
         await dispatch(
           calculateSourceLinesOfCodeThunkAction({ data: formatData })
@@ -202,7 +240,7 @@ const CalculatePage = () => {
     }
   };
 
-  const handleSaveResult = async (e) => {
+  const handleUpdateResult = async (e) => {
     try {
       e.preventDefault();
       if (!getValues().projectName) {
@@ -230,29 +268,23 @@ const CalculatePage = () => {
         sizeType: sizingMethod,
         ...getValues(),
         ...resultState,
+        ...result,
       };
       const res = await dispatch(
-        saveConstructionThunkAction({
+        updateConstructionThunkAction({
           userId: userInfo?._id,
+          constructionId: id,
           data: formatData,
         })
       );
       if (res.payload.success) {
         toast.success("Save construction successfullty");
       }
-      dispatch(clearResult());
-      reset();
 
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
     }
-  };
-
-  const handleResetConstruction = (e) => {
-    e.preventDefault();
-    dispatch(clearResult());
-    reset();
   };
 
   return (
@@ -325,9 +357,6 @@ const CalculatePage = () => {
                   </div>
                 ))}
               </div>
-              {/* <Button primary className="px-8 bg-green-600 hover:bg-green-500">
-                Import .CSV
-              </Button> */}
             </div>
             {sizingMethod === "SLOC" ? (
               <>
@@ -490,14 +519,10 @@ const CalculatePage = () => {
             {isLoggedIn ? (
               <Button
                 primary
-                className={`px-8 bg-yellow-900 hover:bg-yellow-800 ${
-                  result?.softwareEffort
-                    ? "opacity-100"
-                    : "opacity-50 select-none pointer-events-none"
-                }`}
-                onClick={handleSaveResult}
+                className="px-8 bg-yellow-900 hover:bg-yellow-800"
+                onClick={handleUpdateResult}
               >
-                Save
+                Update
               </Button>
             ) : (
               <Modal
@@ -508,13 +533,6 @@ const CalculatePage = () => {
                 <LoginPage />
               </Modal>
             )}
-            <Button
-              primary
-              className="px-8 bg-cyan-900 hover:bg-cyan-800"
-              onClick={handleResetConstruction}
-            >
-              Reset
-            </Button>
           </div>
         </div>
         <div className="h-[2px] w-full bg-gray-500 rounded-full"></div>
@@ -529,44 +547,48 @@ const CalculatePage = () => {
           <ResultItem
             label="Effort"
             unit="Person-months"
-            result={result?.softwareEffort}
+            result={result?.softwareEffort || resultState?.softwareEffort}
           />
           <ResultItem
             label="Schedule"
             unit="Months"
-            result={result?.softwareSchedule}
+            result={result?.softwareSchedule || resultState?.softwareSchedule}
           />
-          <ResultItem label="Cost" unit="$" result={result?.cost} />
+          <ResultItem
+            label="Cost"
+            unit="$"
+            result={result?.cost || resultState?.cost}
+          />
           <ResultItem
             label="Total Equivalent Size"
             unit="SLOC"
-            result={result?.totalEquivalentSize}
+            result={
+              result?.totalEquivalentSize || resultState?.totalEquivalentSize
+            }
           />
           <ResultItem
             label="Effort Adjustment Factor (EAF)"
-            result={result?.softwareEAF}
+            result={result?.softwareEAF || resultState?.softwareEAF}
           />
         </div>
         <div className="flex flex-col gap-2">
           <Label label="Acquisition Phase Distribution" isTitle />
-          <AcquisitionDistributeTable result={result} />
+          <AcquisitionDistributeTable
+            result={result?.softwareEffort ? result : resultState}
+          />
         </div>
-        {result?.dataChart?.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <Label label="Staffing Profile" isTitle />
-            <VerticalBarChart data={result?.dataChart} className="h-[360px]" />
-          </div>
-        )}
         <div className="flex flex-col gap-2">
           <Label
             label="Software Effort Distribution for RUP/MBASE (Person-Months)"
             isTitle
           />
-          <SoftwareEffortDistributeTable result={result} />
+          <SoftwareEffortDistributeTable
+            result={result.softwareEffort ? result : resultState}
+          />
         </div>
       </form>
     </div>
   );
 };
 
-export default CalculatePage;
+export default UpdateConstruction;

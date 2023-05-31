@@ -24,9 +24,10 @@ const getDetailConstructionAPI = async ({ userId, constructionId }) => {
   }
 };
 
-const updateConstructionAPI = async ({ userId, constructionId }) => {
+const updateConstructionAPI = async ({ userId, constructionId, data }) => {
   const res = await axiosClient.put(
-    `/construction/update-construction/${userId}/${constructionId}`
+    `/construction/update-construction/${userId}/${constructionId}`,
+    data
   );
   if (res) {
     return res;
